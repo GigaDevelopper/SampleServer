@@ -15,9 +15,11 @@ class lrucache
 public:
     lrucache(int capacity);
 
-    std::string  get(const std::string &key);
-    void put(const std::string &key, std::string &&value);
-    //overload put with const string &
+    std::string  get(const std::string &key);//get element from cache
+    void put(const std::string &key, std::string &&value);//put element to cache
+
+    typename std::list<std::string>::iterator begin(); // iterator to the beginning of cache
+    typename std::list<std::string>::iterator end();   // iterator to the end of cache
 
 private:
     int capacity_;

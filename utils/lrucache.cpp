@@ -48,3 +48,13 @@ void server::utils::lrucache::put(const std::string &key, std::string &&value)
         keyIterator_[key] = order_.begin();
     }
 }
+
+std::list<std::string>::iterator server::utils::lrucache::begin()
+{
+    return order_.begin();
+}
+
+std::list<std::string>::iterator server::utils::lrucache::end()
+{
+    return order_.end();
+}
