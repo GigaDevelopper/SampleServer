@@ -1,0 +1,3 @@
+/home/azmiddin/sampleServer/build/Desktop_Qt_6_5_3_GCC_64bit-Debug/CMakeFiles/sampleServer.dir
+/home/azmiddin/sampleServer/build/Desktop_Qt_6_5_3_GCC_64bit-Debug/CMakeFiles/edit_cache.dir
+/home/azmiddin/sampleServer/build/Desktop_Qt_6_5_3_GCC_64bit-Debug/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,18 @@
+# ninja log v5
+3	934	1720552051567622114	tests/CMakeFiles/runTests.dir/test_lru.cpp.o	1102800caa9e8548
+2	1334	1720556739969941801	CMakeFiles/sampleServer.dir/main.cpp.o	c580b4fa74687da0
+1334	1397	1720556740033942577	sampleServer	739305e46c638433
+1	538	1720551187589203445	CMakeFiles/sampleServer.dir/utils/lrucache.cpp.o	8388799fe71241d2
+2	1246	1720558010383387016	CMakeFiles/sampleServer.dir/main.cpp.o	c580b4fa74687da0
+2	1621	1720558010759387984	CMakeFiles/sampleServer.dir/utils/utils.cpp.o	988cb0df65e89ea5
+1621	1725	1720558010863388252	sampleServer	713ebedb9125cda8
+4	1544	1720558071423545880	CMakeFiles/sampleServer.dir/utils/utils.cpp.o	988cb0df65e89ea5
+1544	1628	1720558071507546100	sampleServer	713ebedb9125cda8
+2	1562	1720558140987730927	CMakeFiles/sampleServer.dir/utils/utils.cpp.o	988cb0df65e89ea5
+1562	1648	1720558141075731164	sampleServer	713ebedb9125cda8
+1	1111	1720558219719944867	CMakeFiles/sampleServer.dir/main.cpp.o	c580b4fa74687da0
+1111	1196	1720558219803945098	sampleServer	713ebedb9125cda8
+1	1138	1720558279324109598	CMakeFiles/sampleServer.dir/main.cpp.o	c580b4fa74687da0
+1139	1224	1720558279412109843	sampleServer	713ebedb9125cda8
+2	1792	1720558503644746823	CMakeFiles/sampleServer.dir/utils/utils.cpp.o	988cb0df65e89ea5
+1792	1888	1720558503740747101	sampleServer	713ebedb9125cda8
