@@ -1,7 +1,6 @@
 #include "utils.h"
 
 #include <boost/filesystem.hpp>
-
 #include <iostream>
 
 bool server::utils::command_line_ptions::operator()(int argc, char **argv)

@@ -20,30 +20,31 @@ std::string server::utils::lrucache::get(const std::string &key)
 
     //change order least recently used
     std::unique_lock<std::shared_mutex> writeLock(mutex_);
-    auto listIterator = keyIterator_[key];
-    if(listIterator != order_.end() && listIterator != order_.begin()){
-        order_.erase(listIterator);
-        order_.push_front(key);
-        keyIterator_[key] = order_.begin();
-    }
+    // Move the accessed key to the front of the order list
+    order_.splice(order_.begin(), order_, keyIterator_[key]);
     return it->second;
 }
 void server::utils::lrucache::put(const std::string &key, std::string &&value)
 {
-    //update key if key has and order position
-    if(!get(key).empty()){
-        std::unique_lock<std::shared_mutex> writeLock(mutex_);
-        keyValue_[key] = std::move(value);
-        return;
-    }
+
     std::unique_lock<std::shared_mutex> writeLock(mutex_);
-    if((int)order_.size() == capacity_){
-        auto lastKey = order_.back();
-        order_.pop_back();
-        keyValue_.erase(lastKey);
-        keyIterator_.erase(lastKey);
+
+    auto it = keyValue_.find(key);
+    if (it != keyValue_.end()) {
+        // Key exists, update the value and move it to the front
+        it->second = value;
+        order_.splice(order_.begin(), order_, keyIterator_[key]);
+    } else {
+        // Key does not exist, check if we need to evict the least recently used item
+        if (order_.size() == capacity_) {
+            auto leastUsedKey = std::move(order_.back());
+            order_.pop_back();
+            keyValue_.erase(leastUsedKey);
+            keyIterator_.erase(leastUsedKey);
+        }
+        // Insert the new key-value pair
+        order_.push_front(key);
+        keyValue_[key] = std::move(value);
+        keyIterator_[key] = order_.begin();
     }
-    order_.push_front(key);
-    keyIterator_[key] = order_.begin();
-    keyValue_[key] = value;
 }
