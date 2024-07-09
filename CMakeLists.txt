@@ -9,8 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #link boost pakcage
 find_package(Boost 1.70.0 REQUIRED COMPONENTS system filesystem program_options)
 
-add_executable(${PROJECT_NAME} main.cpp
-    utils/utils.h utils/utils.cpp)
+add_executable(${PROJECT_NAME} main.cpp)
 
 #targets
 target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
