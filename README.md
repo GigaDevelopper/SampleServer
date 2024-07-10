@@ -14,7 +14,7 @@
 This project uses CMake for building.
 
 1. **Install Boost:**
-   * Follow the instructions for your operating system at [https://www.boost.org/doc/libs/latest/more/getting_started/unix-variants.html](https://www.boost.org/doc/libs/latest/more/getting_started/unix-variants.html).
+   * Follow the instructions for your operating system at [boost 1_70_0](https://www.boost.org/users/history/version_1_70_0.html).
 
 2. **Create a build directory:**
    ```bash
@@ -58,7 +58,7 @@ Contributions are welcome! Please follow these guidelines:
 
 **Contact:**
 
-[Provide contact information, e.g., email address, website]
+[aziktuit@gmail.com]
 
 **Key Changes:**
 
