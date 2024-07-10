@@ -15,7 +15,7 @@ int main(int argc, char** argv)
     // if(options(argc, argv))
     // {
     //
-        server::HTTPServer server("/home/azmiddin", options.cache_size, 4080);
+        server::http_server server("/home/azmiddin", 4, 4080);
         server.run();
 
     return 0;
