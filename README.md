@@ -1,6 +1,5 @@
 Certainly! Here is the markdown code for the updated `README.md` file:
 
-```markdown
 **SampleServer**
 
 [Provide a brief description of your project and its purpose. What problem does it solve? What are its key features?]
