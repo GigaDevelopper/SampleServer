@@ -51,6 +51,9 @@ void server::utils::lrucache::put(const std::string &key, std::string &&value)
 
 std::list<std::string>::iterator server::utils::lrucache::begin()
 {
+    if(order_.empty())
+        return order_.end();
+
     return order_.begin();
 }
 

@@ -10,11 +10,13 @@ namespace server {
 
 namespace asio = boost::asio;
 using context_ptr = std::shared_ptr<boost::asio::io_context>;
+using cache_ptr = std::shared_ptr<server::utils::lrucache>;
+
 
 class http_connection : public std::enable_shared_from_this<http_connection> {
 public:
-    http_connection(boost::asio::ip::tcp::socket socket, context_ptr& io_context,
-                    const std::string & root_directory, int cach_size);
+    http_connection(asio::ip::tcp::socket socket, context_ptr& io_context,
+                    const std::string & root_directory, int cach_size, cache_ptr &cache);
     void start();
 
 private:
@@ -30,7 +32,7 @@ private:
     std::string root_directory_;
     int cache_size_;
 
-    std::shared_ptr<server::utils::lrucache> image_cache_;
+    std::shared_ptr<server::utils::lrucache> images_cache_;
 };
 
 } // namespace server

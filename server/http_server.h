@@ -2,6 +2,7 @@
 #define HTTP_SERVER_H
 
 #include "utils/lrucache.h"
+#include "server/connection.h"
 
 #include <boost/asio.hpp>
 #include <thread>
@@ -12,7 +13,6 @@ namespace server {
 
 namespace asio = boost::asio;
 
-using image_ptr = std::shared_ptr<server::utils::lrucache>;
 class http_server {
 public:
     http_server(const std::string& root_directory, int cache_size, unsigned short port);
@@ -30,7 +30,7 @@ private:
     int cache_size_;
     unsigned short port_;
 
-    image_ptr image_cache_;
+    server::cache_ptr image_cache_;
 };
 
 } // namespace server
