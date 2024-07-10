@@ -61,6 +61,7 @@ void server::http_connection::handle_request(const boost::system::error_code& ec
                      {"Connection", "close"}},
                     ""
                 };
+                std::clog << response.to_string() << std::endl;
                 write_response(response.to_string());
             }
     }
@@ -76,6 +77,7 @@ void server::http_connection::get_image_handler(const std::string& request_path)
              {"Connection", "close"}},
             ""
         };
+        std::clog << response.to_string() << std::endl;
         write_response(response.to_string());
         return;
     }
@@ -90,6 +92,7 @@ void server::http_connection::get_image_handler(const std::string& request_path)
              {"Connection", "close"}},
             cached_image
         };
+        std::clog << response.to_string() << std::endl;
         write_response(response.to_string());
     }
     else {
@@ -104,6 +107,7 @@ void server::http_connection::get_image_handler(const std::string& request_path)
                  {"Connection", "close"}},
                 image_content
             };
+            std::clog << response.to_string() << std::endl;
             write_response(response.to_string());
         }
         //else not found
@@ -115,6 +119,7 @@ void server::http_connection::get_image_handler(const std::string& request_path)
                  {"Connection", "close"}},
                 ""
             };
+            std::clog << response.to_string() << std::endl;
             write_response(response.to_string());
         }
     }
@@ -144,5 +149,6 @@ void server::http_connection::get_images_handler() {
          {"Connection", "close"}},
         images_list
     };
+    std::clog << response.to_string() << std::endl;
     write_response(response.to_string());
 }
