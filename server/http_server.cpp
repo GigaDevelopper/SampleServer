@@ -1,47 +1,27 @@
-#include <server/http_server.h>
-#include <server/connection.h>
+#include "server/http_server.h"
+#include "server/connection.h"
 
 namespace server {
 
-HTTPServer::HTTPServer(const std::string& root_directory, int cache_size, unsigned short port)
+http_server::http_server(const std::string& root_directory, int cache_size, unsigned short port)
     : root_directory_(root_directory), cache_size_(cache_size), port_(port) {
+    io_context_ = std::make_shared<asio::io_context>();
+    acceptor_ = std::make_shared<asio::ip::tcp::acceptor>(*io_context_, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port_));
+}
 
-    this->io_context_ = std::make_unique<asio::io_context>;
-    this->work_ = std::make_unique<boost::asio::io_context::work>(io_context_.get());
-
-    const int num_threads = 4;
-    for (size_t i = 0; i < num_threads; ++i) {
-        workers_.emplace_back([&io_context_]() {
-            io_context_->run();
-        });
-    }
-
+void http_server::run() {
     start_accept();
+    io_context_->run();
 }
 
-void HTTPServer::run() {
-    for (auto& thread : workers_) {
-        if (thread.joinable()) {
-            thread.join();
-        }
-    }
-}
-
-void HTTPServer::start_accept() {
-    for (size_t i = 0; i < 4; ++i) {
-        server::http_connection::pointer new_connection =
-            server::http_connection::create(io_contexts_[i], root_directory_, cache_size_);
-
-        auto& acceptor = *acceptors_[i];
-
-        acceptor.async_accept(new_connection->socket(),
-                              [this, new_connection, i, &acceptor](const boost::system::error_code& error) {
-                                  if (!error) {
-                                      new_connection->start();
-                                  }
-                                  start_accept(); // Перезапускаем ожидание соединений
-                              });
-    }
+void http_server::start_accept() {
+    acceptor_->async_accept(
+        [this](std::error_code ec, asio::ip::tcp::socket socket) {
+            if (!ec) {
+                std::make_shared<http_connection>(std::move(socket), io_context_, root_directory_, cache_size_)->start();
+            }
+            start_accept();
+        });
 }
 
 } // namespace server
