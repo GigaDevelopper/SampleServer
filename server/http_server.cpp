@@ -20,7 +20,6 @@ HTTPServer::HTTPServer(const std::string& root_directory, int cache_size, unsign
 }
 
 void HTTPServer::run() {
-    // В этом месте работа всех контекстов ввода-вывода уже запущена
     for (auto& thread : workers_) {
         if (thread.joinable()) {
             thread.join();
@@ -33,7 +32,7 @@ void HTTPServer::start_accept() {
         server::http_connection::pointer new_connection =
             server::http_connection::create(io_contexts_[i], root_directory_, cache_size_);
 
-        auto& acceptor = *acceptors_[i]; // Получаем ссылку на acceptor
+        auto& acceptor = *acceptors_[i];
 
         acceptor.async_accept(new_connection->socket(),
                               [this, new_connection, i, &acceptor](const boost::system::error_code& error) {
