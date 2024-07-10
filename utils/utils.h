@@ -10,6 +10,7 @@ namespace utils{
 
 namespace fs = boost::filesystem;
 namespace  po = boost::program_options;
+
 //struct for parsing command line options
 struct command_line_ptions {
 
@@ -19,10 +20,18 @@ struct command_line_ptions {
     int cache_size;
 };
 
-std::string get_images_list(const std::string& path);
-std::string base64_encode(const std::vector<unsigned char>& data);
-std::vector<unsigned char> read_file(const std::string& path);
+std::string read_file(const std::string& file_path);
+}//namespace utils
 
-}
-}
+namespace http {
+struct http_response {
+    std::string status_line;
+    std::unordered_map<std::string, std::string> headers;
+    std::string body;
+
+    std::string to_string() const;
+};
+}//namespace http utils
+
+}//namespace server
 #endif // UTILS_H

@@ -23,6 +23,11 @@ private:
     void read_requests();
     void write_response(std::string && response);
 
+    //handlers
+    void handle_request(const boost::system::error_code& ec, std::shared_ptr<server::http_connection> self);
+    void get_image_handler(const std::string& request_path);
+    void get_images_handler();
+
 private:
     asio::ip::tcp::socket socket_;
     boost::asio::strand<boost::asio::io_context::executor_type> strand_;

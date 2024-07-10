@@ -19,123 +19,129 @@ void server::http_connection::start()
     read_requests();
 }
 
-void server::http_connection::read_requests()
-{
+void server::http_connection::read_requests() {
     auto self(shared_from_this());
     boost::asio::async_read_until(socket_, request_buf_, "\r\n",
-                                  [this, self](boost::system::error_code ec, std::size_t /*bytes_transferred*/) {
-                                      if (!ec) {
-                                          std::istream request_stream(&request_buf_);
-                                          std::string request_method;
-                                          std::string request_path;
-                                          std::string http_version;
-                                          request_stream >> request_method >> request_path >> http_version;
-
-                                          std::clog << request_path << " path\n";
-
-                                          if (request_method == "GET" && request_path.rfind("/image/", 0) == 0) {
-                                              std::string image_name = request_path.substr(7); // Remove "/image/"
-                                              std::string cached_image = images_cache_->get(image_name);
-
-                                              if (!cached_image.empty()) {
-                                                  // Return the cached image
-                                                  std::string response =
-                                                      "HTTP/1.1 200 OK\r\n"
-                                                      "Content-Type: image/png\r\n"
-                                                      "Content-Length: " + std::to_string(cached_image.size()) + "\r\n"
-                                                                                              "Connection: close\r\n"
-                                                                                              "\r\n" +
-                                                      cached_image;
-                                                  write_response(std::move(response));
-                                              } else {
-                                                  // Check the image in the file system
-                                                  std::string image_path = root_directory_ + "/" + image_name;
-                                                  std::ifstream image_file(image_path, std::ios::binary | std::ios::ate);
-                                                  if (image_file.is_open()) {
-                                                      std::streamsize image_size = image_file.tellg();
-                                                      image_file.seekg(0, std::ios::beg);
-
-                                                      std::vector<char> buffer(image_size);
-                                                      if (image_file.read(buffer.data(), image_size)) {
-                                                          std::string image_content(buffer.begin(), buffer.end());
-
-                                                          // Cache the image
-                                                          images_cache_->put(image_name, std::move(image_content));
-
-                                                          std::string response =
-                                                              "HTTP/1.1 200 OK\r\n"
-                                                              "Content-Type: image/png\r\n"
-                                                              "Content-Length: " + std::to_string(buffer.size()) + "\r\n"
-                                                                                                "Connection: close\r\n"
-                                                                                                "\r\n";
-                                                          response.insert(response.end(), buffer.begin(), buffer.end());
-                                                          write_response(std::move(response));
-                                                      } else {
-                                                          // Failed to read the image file
-                                                          std::string response =
-                                                              "HTTP/1.1 500 Internal Server Error\r\n"
-                                                              "Content-Type: text/plain\r\n"
-                                                              "Content-Length: 0\r\n"
-                                                              "Connection: close\r\n"
-                                                              "\r\n";
-                                                          write_response(std::move(response));
-                                                      }
-                                                  } else {
-                                                      // Image file not found
-                                                      std::string response =
-                                                          "HTTP/1.1 404 Not Found\r\n"
-                                                          "Content-Type: text/plain\r\n"
-                                                          "Content-Length: 0\r\n"
-                                                          "Connection: close\r\n"
-                                                          "\r\n";
-                                                      write_response(std::move(response));
-                                                  }
-                                              }
-                                          } else if (request_method == "GET" && request_path == "/images/") {
-                                              // Retrieve list of images from the cache
-                                              std::vector<std::string> image_names;
-                                              for (auto it = images_cache_->begin(); it != images_cache_->end(); ++it) {
-                                                  image_names.push_back(*it);
-                                              }
-
-                                              std::string images_list = "[";
-                                              for (const auto& name : image_names) {
-                                                  images_list += "\"" + name + "\",";
-                                              }
-                                              if (!image_names.empty()) {
-                                                  images_list.pop_back(); // Remove last comma
-                                              }
-                                              images_list += "]";
-
-                                              std::string response =
-                                                  "HTTP/1.1 200 OK\r\n"
-                                                  "Content-Type: application/json\r\n"
-                                                  "Content-Length: " + std::to_string(images_list.length()) + "\r\n"
-                                                                                           "Connection: close\r\n"
-                                                                                           "\r\n" +
-                                                  images_list;
-                                              write_response(std::move(response));
-                                          } else {
-                                              std::string response =
-                                                  "HTTP/1.1 405 Method Not Allowed\r\n"
-                                                  "Content-Type: text/plain\r\n"
-                                                  "Content-Length: 0\r\n"
-                                                  "Connection: close\r\n"
-                                                  "\r\n";
-                                              write_response(std::move(response));
-                                          }
-                                      }
-                                  });
+                                  boost::bind(&server::http_connection::handle_request, this, boost::asio::placeholders::error, self));
 }
 
-void server::http_connection::write_response(std::string &&response)
-{
+void server::http_connection::write_response(std::string&& response_str) {
     auto self(shared_from_this());
-    boost::asio::async_write(socket_, boost::asio::buffer(std::move(response)),
-                             [this, self](boost::system::error_code ec, std::size_t /*length*/) {
+    boost::asio::async_write(socket_, boost::asio::buffer(std::move(response_str)),
+                             [this, self](boost::system::error_code ec, std::size_t /*bytes_transferred*/) {
                                  if (!ec) {
                                      boost::system::error_code ignored_ec;
-                                     socket_.shutdown(asio::ip::tcp::socket::shutdown_both, ignored_ec);
+                                     socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
                                  }
                              });
+}
+
+void server::http_connection::handle_request(const boost::system::error_code& ec, std::shared_ptr<server::http_connection> self) {
+    if (!ec) {
+        std::istream request_stream(&request_buf_);
+        std::string request_method;
+        std::string request_path;
+        std::string http_version;
+        request_stream >> request_method >> request_path >> http_version;
+        std::clog << "Path: " << request_path << "  Method: "<<request_method << std::endl;
+
+        // Check request method and path
+        if (request_method == "GET" && request_path.rfind("/image/", 0) == 0) {
+            get_image_handler(request_path);
+        }
+        else if (request_method == "GET" && request_path == "/images") {
+            get_images_handler();
+        }
+        else {
+            server::http::http_response response{
+                "HTTP/1.1 400 Bad Request",
+                {{"Content-Type", "text/plain"},
+                 {"Content-Length", "0"},
+                 {"Connection", "close"}},
+                ""
+            };
+            write_response(response.to_string());
+        }
+    }
+}
+
+void server::http_connection::get_image_handler(const std::string& request_path) {
+    std::string image_name = request_path.substr(7); // Remove "/image/"
+    if (server::utils::fs::extension(root_directory_ +"/" + image_name) != ".png"){
+        server::http::http_response response{
+            "HTTP/1.1 400 Bad Request",
+            {{"Content-Type", "text/plain"},
+             {"Content-Length", "0"},
+             {"Connection", "close"}},
+            ""
+        };
+        write_response(response.to_string());
+        return;
+    }
+
+    std::string cached_image = images_cache_->get(image_name);
+    //check cached image
+    if (!cached_image.empty()) {
+        server::http::http_response response{
+            "HTTP/1.1 200 OK",
+            {{"Content-Type", "image/png"},
+             {"Content-Length", std::to_string(cached_image.size())},
+             {"Connection", "close"}},
+            cached_image
+        };
+        write_response(response.to_string());
+    }
+    else {
+        std::string image_content = server::utils::read_file(root_directory_ + "/" + image_name);
+        //if image found
+        if (!image_content.empty()) {
+            images_cache_->put(image_name, image_content);
+            server::http::http_response response{
+                "HTTP/1.1 200 OK",
+                {{"Content-Type", "image/png"},
+                 {"Content-Length", std::to_string(image_content.size())},
+                 {"Connection", "close"}},
+                image_content
+            };
+            write_response(response.to_string());
+        }
+        //else not found
+        else {
+            server::http::http_response response{
+                "HTTP/1.1 404 Not Found",
+                {{"Content-Type", "text/plain"},
+                 {"Content-Length", "0"},
+                 {"Connection", "close"}},
+                ""
+            };
+            write_response(response.to_string());
+        }
+    }
+}
+
+void server::http_connection::get_images_handler() {
+    std::vector<std::string> image_names;
+    for (auto it = images_cache_->begin(); it != images_cache_->end(); ++it) {
+        image_names.push_back(*it);
+    }
+
+    std::ostringstream oss;
+    oss << "[";
+    for (size_t i = 0; i < image_names.size(); ++i) {
+        oss << "\"" << image_names[i] << "\"";
+        if (i != image_names.size() - 1) {
+            oss << ",";
+        }
+    }
+    oss << "]";
+
+    std::string images_list = oss.str();
+    server::http::http_response response{
+        "HTTP/1.1 200 OK",
+        {{"Content-Type", "application/json"},
+         {"Content-Length", std::to_string(images_list.length())},
+         {"Connection", "close"}},
+        images_list
+    };
+    write_response(response.to_string());
 }

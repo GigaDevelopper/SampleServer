@@ -17,6 +17,8 @@ public:
 
     std::string  get(const std::string &key);//get element from cache
     void put(const std::string &key, std::string &&value);//put element to cache
+    void put(const std::string &key, const std::string &value);//put element to cache
+
 
     typename std::list<std::string>::iterator begin(); // iterator to the beginning of cache
     typename std::list<std::string>::iterator end();   // iterator to the end of cache
