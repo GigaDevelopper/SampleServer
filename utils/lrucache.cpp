@@ -1,6 +1,7 @@
 #include "lrucache.h"
 
 #include <mutex>
+#include <stdexcept>
 
 server::utils::lrucache::lrucache(int capacity)
     :capacity_{capacity}
