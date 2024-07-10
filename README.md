@@ -1,3 +1,4 @@
+Certainly! Here is the markdown code for the updated `README.md` file:
 
 **SampleServer**
 
@@ -13,7 +14,7 @@
 
 This project uses CMake for building.
 
-1. **Install Boost:**
+1. **Install Boost 1.70.0:**
    * Follow the instructions for your operating system at [boost 1_70_0](https://www.boost.org/users/history/version_1_70_0.html).
 
 2. **Create a build directory:**
@@ -64,3 +65,6 @@ Contributions are welcome! Please follow these guidelines:
 
 * Added a "Getting Started" section with instructions on how to build and run the project.
 * Removed the placeholder for the executable name.
+```
+
+You can copy and paste this markdown code into your `README.md` file for your project.
