@@ -1,5 +1,7 @@
 #include "server/http_server.h"
 
+#include <iostream>
+
 namespace server {
 
 http_server::http_server(const std::string& root_directory, int cache_size, unsigned short port)
@@ -10,6 +12,7 @@ http_server::http_server(const std::string& root_directory, int cache_size, unsi
 }
 
 void http_server::run() {
+    std::clog <<"server runingg.. on " << port_ << std::endl;
     start_accept();
     io_context_->run();
 }
@@ -18,6 +21,7 @@ void http_server::start_accept() {
     acceptor_->async_accept(
         [this](std::error_code ec, asio::ip::tcp::socket socket) {
             if (!ec) {
+                std::clog <<"New incoming connection: ";
                 std::make_shared<http_connection>(std::move(socket), io_context_, root_directory_, cache_size_, image_cache_)->start();
             }
             start_accept();

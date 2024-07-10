@@ -49,19 +49,20 @@ void server::http_connection::handle_request(const boost::system::error_code& ec
         if (request_method == "GET" && request_path.rfind("/image/", 0) == 0) {
             get_image_handler(request_path);
         }
-        else if (request_method == "GET" && request_path == "/images") {
-            get_images_handler();
-        }
-        else {
-            server::http::http_response response{
-                "HTTP/1.1 400 Bad Request",
-                {{"Content-Type", "text/plain"},
-                 {"Content-Length", "0"},
-                 {"Connection", "close"}},
-                ""
-            };
-            write_response(response.to_string());
-        }
+        else
+            if (request_method == "GET" && (request_path == "/images" || request_path == "/images/")) {
+                get_images_handler();
+            }
+            else {
+                server::http::http_response response{
+                    "HTTP/1.1 400 Bad Request",
+                    {{"Content-Type", "text/plain"},
+                     {"Content-Length", "0"},
+                     {"Connection", "close"}},
+                    ""
+                };
+                write_response(response.to_string());
+            }
     }
 }
 

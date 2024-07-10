@@ -4,10 +4,7 @@
 #include "utils/lrucache.h"
 #include "server/connection.h"
 
-#include <boost/asio.hpp>
-#include <thread>
 #include <memory>
-#include <vector>
 
 namespace server {
 
