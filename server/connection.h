@@ -37,7 +37,7 @@ private:
     std::string root_directory_;
     int cache_size_;
 
-    std::shared_ptr<server::utils::lrucache> images_cache_;
+    cache_ptr images_cache_;
 };
 
 } // namespace server

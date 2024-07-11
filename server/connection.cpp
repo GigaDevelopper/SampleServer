@@ -92,7 +92,7 @@ void server::http_connection::get_image_handler(const std::string& request_path)
              {"Connection", "close"}},
             cached_image
         };
-        std::clog << response.to_string() << std::endl;
+        std::clog << "Sending file.." << std::endl;
         write_response(response.to_string());
     }
     else {
@@ -107,7 +107,7 @@ void server::http_connection::get_image_handler(const std::string& request_path)
                  {"Connection", "close"}},
                 image_content
             };
-            std::clog << response.to_string() << std::endl;
+            std::clog << "Sending file.." << std::endl;
             write_response(response.to_string());
         }
         //else not found
