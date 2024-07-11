@@ -1,8 +1,6 @@
-Certainly! Here is the markdown code for the updated `README.md` file:
-
 **SampleServer**
 
-[Provide a brief description of your project and its purpose. What problem does it solve? What are its key features?]
+A Sample Server with boost
 
 **Getting Started**
 
@@ -66,5 +64,3 @@ Contributions are welcome! Please follow these guidelines:
 * Added a "Getting Started" section with instructions on how to build and run the project.
 * Removed the placeholder for the executable name.
 ```
-
-You can copy and paste this markdown code into your `README.md` file for your project.
